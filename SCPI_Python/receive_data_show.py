@@ -44,7 +44,7 @@ logger.info(f'Trigger mode: {answ}')
 assert 'INTERNAL' == answ, f'Failed on setting the trigger mode to INTERNAL. Received {answ}'
 
 # set internal trigger to 100 ms
-inst.write('TRIG:INT 100000 US')
+inst.write('TRIG:INT 250000 US')
 time.sleep(0.5)
 # read back trigger interval (optional)
 answ = inst.query('TRIGgering:INTerval?')

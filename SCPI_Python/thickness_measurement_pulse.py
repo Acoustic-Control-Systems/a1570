@@ -48,7 +48,7 @@ logger.info(f'Trigger mode: {answ}')
 assert 'INTERNAL' == answ, f'Failed on setting the trigger mode to INTERNAL. Received {answ}'
 
 # set internal trigger to 100 ms
-inst.write('TRIG:INT 100000 US')
+inst.write('TRIG:INT 250000 US')
 time.sleep(0.5)
 # read back trigger interval (optional)
 answ = inst.query('TRIGgering:INTerval?')
@@ -82,7 +82,7 @@ if is_manual_calibration:
     inst.write('STAR:CAL:AIR')
 
     # wait for calibration to finish
-    time.sleep(3)
+    time.sleep(6)
 
 ## option 2: set parameters from top without calibration
 else:
@@ -192,7 +192,7 @@ last_counter = -1
 sleeping_time = 2 # seconds
 
 # set internal trigger to 1 s (for pulse magnet it is recommended to reduce the trigger interval to prevent fast overheating of the probe)
-inst.write('TRIG:INT 1 S')
+inst.write('TRIG:INT 0.25 S')
 time.sleep(0.5)
 # read back trigger interval (optional)
 answ = inst.query('TRIGgering:INTerval?')
