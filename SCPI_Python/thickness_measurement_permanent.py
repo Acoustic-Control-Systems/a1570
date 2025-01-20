@@ -1,3 +1,18 @@
+"""
+Automatic thickness measurement example using A1570 EMAT device with permanent magnet probe.
+
+Features:
+- SCPI communication setup
+- Manual or automatic calibration
+- Continuous thickness measurement in automatic mode
+- Error queue monitoring
+
+Usage:
+1. Set IP address of device
+2. Choose calibration mode (manual/automatic)
+3. Run script to start measurements
+"""
+
 import sys
 import time
 import matplotlib.pyplot as plt
@@ -6,37 +21,43 @@ import logging
 
 from common_functions import *
 
-### initializing
-# set up logging
+### Logger Setup ###
+# Configure logging to show info level messages
 logger = logging.getLogger()
-# create console handler and set level to info
 logger.level = logging.INFO
 stream_handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(stream_handler)
 
-# switch to True if you want to calibrate manually or False to set calibration values from top without calibration
+### Configuration Parameters ###
+# Manual calibration mode:
+# True = Interactive calibration during runtime
+# False = Use predefined calibration values
 is_manual_calibration = True
 
 logger.info('Initialize SCPI for A1570...')
 
-# ip of the device and port
-ip: str = '192.168.0.11'
-port: int = 5025
+### Device Communication Setup ###
+# Network configuration - adjust as needed
+ip: str = '192.168.0.11'  # Device IP address
+port: int = 5025          # Default SCPI port
+
+# Initialize VISA connection
 rm = visa.ResourceManager()
 inst = rm.open_resource(f'tcpip::{ip}::{str(port)}::SOCKET')
 inst.encoding = 'iso-8859-1'
-inst.timeout = 5000 # miliseconds
+inst.timeout = 5000        # Response timeout in milliseconds
 inst.read_termination = '\r\n'
 inst.write_termination = '\r\n'
 
-# readout error queue before start
+### Error Queue Check ###
+# Clear any pending errors before starting measurement
 while True:
     err_num, err_msg = read_error_queue(inst)
     if (err_num == 0):
         break
 
-# read IDN string, it returns manufacturer, model, serial number and firmware version
-# e.g. 'ACS-Solutions GmbH,A1570,123456789,ESP 1.25 MCU 6.01.244'
+### Device Identification ###
+# Query device info: manufacturer, model, serial number, firmware
 idn: str = inst.query('*IDN?')
 logger.info(idn)
 
@@ -162,8 +183,6 @@ for i in range(1000):
 
 # stop measurement
 inst.write('STOP:MEAS')
-
-
 
 # close connection
 inst.close()
