@@ -30,7 +30,7 @@ logger.info('Initialize SCPI for A1570...')
 ip: str = '192.168.0.1'  # Default device IP
 port: int = 5025         # Default SCPI port
 rm = visa.ResourceManager()
-inst = rm.open_resource(f'tcpip::{ip}::{str(port)}::SOCKET')
+inst:visa.Resource = rm.open_resource(f'tcpip::{ip}::{str(port)}::SOCKET')
 inst.encoding = 'iso-8859-1'
 inst.timeout = 5000      # milliseconds - time to wait for device response
 inst.read_termination = '\r\n'
@@ -42,12 +42,14 @@ while True:
     if (err_num == 0):
         break
 
-def measurement_strobe_permanent():
+
+
+def measurement_strobe_pulse():
     """
     Configure and perform thickness measurement using permanent magnet probe.
     
     Sets up:
-    - Probe type (S7694 permanent magnet probe)
+    - Probe type (S3850 pulse magnet probe)
     - A-scan vector transmission
     - Signal averaging
     - Measurement parameters
@@ -56,10 +58,10 @@ def measurement_strobe_permanent():
         Enabling A-scan vector transmission reduces measurement performance
         but is useful for debugging and setup.
         
-        Prior performing measurements, ensure the probe is properly connected and the probe is calibrated (in air and on object).
+        Prior performing measurements, ensure the probe is properly connected, batteries are inserted, and the probe is calibrated (in air and on object).
     """
     # Set probe type for permanent magnet EMAT
-    pt = 'S7694'
+    pt = 'S3850'
     inst.write(f'SENSe:PROBe:TYPE "{pt}"')
     answ = inst.query('SENSe:PROBe:TYPE?')
     assert pt == answ, f'Failed on setting the probe type to {pt}. Received {answ}'
@@ -114,10 +116,10 @@ def measurement_strobe_permanent():
     sleeping_time = 0.25 # seconds
     
     # set strobe parameters where processing algorithm searches for the peak(s)
-    # examples parameters gives proper result with S7694 probe on 5mm aluminum coin delivered with the device
-    strobe_level = 15 # 0-100%
-    strobe_begin = 140 # 0-8191 samples
-    strobe_width = 250 # 0-8191 samples
+    # examples parameters gives proper result with S3850 probe on 5mm aluminum coin delivered with the device
+    strobe_level = 20 # 0-100%
+    strobe_begin = 300 # 0-8191 samples
+    strobe_width = 400 # 0-8191 samples
     
     set_strobe_parameters(inst, strobe_level, strobe_begin, strobe_width)
 
@@ -161,7 +163,7 @@ if __name__ == '__main__':
     idn: str = inst.query('*IDN?')
     logger.info(idn)
 
-    measurement_strobe_permanent()
+    measurement_strobe_pulse()
 
     inst.close()
     logger.info('End of the script')

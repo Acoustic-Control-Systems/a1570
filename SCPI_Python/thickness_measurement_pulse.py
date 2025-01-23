@@ -20,7 +20,7 @@ is_manual_calibration = True
 logger.info('Initialize SCPI for A1570...')
 
 # ip of the device and port
-ip: str = '192.168.0.11'
+ip: str = '192.168.0.1'
 port: int = 5025
 rm = visa.ResourceManager()
 inst = rm.open_resource(f'tcpip::{ip}::{str(port)}::SOCKET')
@@ -47,7 +47,7 @@ answ = inst.query('TRIGgering:MODE?')
 logger.info(f'Trigger mode: {answ}')
 assert 'INTERNAL' == answ, f'Failed on setting the trigger mode to INTERNAL. Received {answ}'
 
-# set internal trigger to 100 ms
+# set internal trigger to 250 ms
 inst.write('TRIG:INT 250000 US')
 time.sleep(0.5)
 # read back trigger interval (optional)
@@ -191,7 +191,7 @@ last_counter = -1
 # sleeping time between result polls
 sleeping_time = 2 # seconds
 
-# set internal trigger to 1 s (for pulse magnet it is recommended to reduce the trigger interval to prevent fast overheating of the probe)
+# set internal trigger to 0.25 s (for pulse magnet it is recommended to reduce the trigger interval to prevent fast overheating of the probe)
 inst.write('TRIG:INT 0.25 S')
 time.sleep(0.5)
 # read back trigger interval (optional)
