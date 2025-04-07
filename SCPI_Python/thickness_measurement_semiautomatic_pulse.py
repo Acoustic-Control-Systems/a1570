@@ -150,6 +150,26 @@ def measurement_strobe_pulse():
         arr_vector = get_vector_from_SCPI(inst)
         plt.plot(arr_vector)
         plt.show()
+        # request temperature of the EMAT probe
+        # it is not necessary to check the temperature every time
+        # it can be done once per minute or so
+        answ = inst.query('STATus:PROBe:TEMPerature?')
+        # temperature is in Celsius degrees
+        temperature = float(answ)
+        # very low temperature may indicate that the pulse magnet probe is not connected to the device
+        if temperature < -60:
+            logger.warning(f"Probe temperature = {temperature}°C. Check probe connection.")
+        else:
+            # check if the temperature is too high
+            temperatureWarning = 50 # warning threshold, when the measurement is slowed down
+            temperatureError = 75 # error threshold, when the measurement is stopped automatically by the device
+            # log the temperature
+            if temperature > temperatureError:
+                logger.warning(f"Probe temperature = {temperature}°C. No measurements possible until the probe cooled down.")
+            elif temperature > temperatureWarning:
+                logger.warning(f"Probe temperature = {temperature}°C. Measurements will be slowed down.")
+            else:
+                logger.info(f"Probe temperature = {temperature}°C.")            
 
         time.sleep(sleeping_time)        
 
