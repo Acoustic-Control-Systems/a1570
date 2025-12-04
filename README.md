@@ -3,7 +3,7 @@ Examples for integration of A1570 EMAT OEM Ultrasonic Pulser-Receiver frontend u
 
 https://acs-international.com/instruments/emat/a1570-emat-oem/
 
-This repository contains example scripts for programming the A1570 device via SCPI protocol.
+This repository contains example scripts for programming the A1570 device via SCPI and REST API protocols.
 The examples demonstrate how to initialize the device, calibrate probes, and perform measurements.
 
 # Contents
@@ -13,3 +13,4 @@ The examples demonstrate how to initialize the device, calibrate probes, and per
 * [Thickness Measurement (Semiautomatic Permanent Mode)](SCPI_Python/thickness_measurement_semiautomatic_permanent.py) - Example of semiautomatic thickness measurement using permanent magnet probes (e.g. S7694)
 * [Receive and Display Data](SCPI_Python/receive_data_show.py) - Example of receiving and displaying raw data from the device
 * [Common Functions](SCPI_Python/common_functions.py) - Shared utility functions used by other examples
+* [REST API](REST_API/REST-API.md) - Reference for REST API operations
