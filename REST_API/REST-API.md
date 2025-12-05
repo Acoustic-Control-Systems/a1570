@@ -67,12 +67,9 @@ Most device parameters use these endpoints with command IDs defined in the SCPI 
 ### Exception Endpoints
 
 The following parameters use `/api/getValue` and `/api/updateValue` instead of the command endpoints:
-- `serialNumber` (read-only)
-- `version` (read-only)
-- `firmwareVersion` (read-only)
-- `dfuVersion` (read-only)
-- `inputLoggingEnabled`
-- `doSendVectorWithResult`
+- `serialNumber` (read-only) : Serial number of A1570 device.
+- `version` (read-only) : Full version info of A1570 device.
+- `doSendVectorWithResult` : Enable sending raw data together with measurement result.
 
 ## Available Commands
 
@@ -82,15 +79,15 @@ The following parameters use `/api/getValue` and `/api/updateValue` instead of t
 |------------|----------------|-------------|
 | START AUTO ASCAN | - | Start acquisition |
 | STOP AUTO ASCAN | - | Stop acquisition |
-| MEASUREMENT PRR | 1-4 | Periodic acquisition interval |
+| MEASUREMENT PRR | 1-4 | Periodic acquisition interval (Hz) |
 
 ### Input Configuration
 
 | Command ID | Argument/Range | Description |
 |------------|----------------|-------------|
-| GAIN | 0-40 dB | Constant gain at input |
+| GAIN | 0-40 | Constant gain at input (dB) |
 | SOURCE SYNC TYPE | INTERNAL \| EXTERNAL | Acquisition triggering mode |
-| SAMPLING FREQ | 25 \| 50 \| 100 MHz | Input sampling rate |
+| SAMPLING FREQ | 25 \| 50 \| 100 | Input sampling rate (MHz) |
 | ACCUMULATIONS | 0-4 | Acquisitions per averaged vector |
 | FILTER | integer | Digital high-pass filter number |
 
@@ -98,9 +95,9 @@ The following parameters use `/api/getValue` and `/api/updateValue` instead of t
 
 | Command ID | Argument/Range | Description |
 |------------|----------------|-------------|
-| HV VOLTAGE | 200 \| 400 \| 600 V | Transmitter pulse amplitude |
-| ZONDER FREQUENCY | 20-20000 kHz | Transmitter burst frequency |
-| ZONDER PERIODS | 0.5-8.0 periods | Transmitter burst duration |
+| HV VOLTAGE | 200 \| 400 \| 600 | Transmitter pulse amplitude (V) |
+| ZONDER FREQUENCY | 20-20000 | Transmitter burst frequency (kHz) |
+| ZONDER PERIODS | 0.5-8.0 | Transmitter burst duration (periods) |
 | ZONDER ENABLE | ON \| OFF | Transmitter enable |
 | ZONDER REVERSE POLARITY | ON \| OFF | Transducer polarity mode |
 
@@ -109,8 +106,8 @@ The following parameters use `/api/getValue` and `/api/updateValue` instead of t
 | Command ID | Argument/Range | Description |
 |------------|----------------|-------------|
 | MAGNET ENABLE | ON \| OFF | Magnet enabled |
-| MAGNET VOLTAGE | 15-25 V | Magnet voltage |
-| MAGNET DELAY | 10-1300 µs | Magnet delay |
+| MAGNET VOLTAGE | 15-25 | Magnet voltage (V) |
+| MAGNET DELAY | 10-1300 | Magnet delay (µs) |
 
 ### Measurement Commands
 
@@ -133,15 +130,15 @@ The following parameters use `/api/getValue` and `/api/updateValue` instead of t
 | Command ID | Argument/Range | Description |
 |------------|----------------|-------------|
 | PROBE TYPE | S3950, S7692, S7694, S7394, S7392 | Probe type identifier |
-| SOUND VELOCITY | 1000-10000 m/s | Sound velocity in material |
-| PROBE DELAY PROCESSING | 0-100 µs | Probe delay compensation |
-| PROBE TEMPERATURE | °C (read-only) | Temperature of pulse magnet probe |
+| SOUND VELOCITY | 1000-10000 | Sound velocity in material (m/s) |
+| PROBE DELAY PROCESSING | 0-100 | Probe delay compensation (µs) |
+| PROBE TEMPERATURE | read-only | Temperature of pulse magnet probe (°C) |
 
 ### Device Status
 
 | Command ID | Argument/Range | Description |
 |------------|----------------|-------------|
-| BATTERY | 0-100% (read-only) | Battery charge level |
+| BATTERY | 0-100 | Battery charge level (%) |
 | CHARGE STATUS | read-only | Charger connection status |
 
 ### Processing Parameters
@@ -175,10 +172,9 @@ Error responses include a descriptive text message.
 
 ### curl Examples
 
-#### Query Parameter Value
-
+#### Query a parameter:
 ```bash
-curl -X POST http://192.168.1.100/api/getValueCommand \
+curl -X POST http://192.168.0.1/api/getValueCommand \
     -H "Content-Type: application/json" \
     -d "{'id':'GAIN'}"
 ```
@@ -188,10 +184,10 @@ Response:
 {"id":"GAIN","value":"20"}
 ```
 
-#### Update Parameter Value
+#### Update a parameter
 
 ```bash
-curl -X POST http://192.168.1.100/api/updateValueCommand \
+curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
     -d "{'id':'GAIN','value':'30'}"
 ```
@@ -204,7 +200,7 @@ Response:
 #### Start Acquisition
 
 ```bash
-curl -X POST http://192.168.1.100/api/updateValueCommand \
+curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
     -d "{'id':'START AUTO ASCAN'}"
 ```
@@ -212,7 +208,7 @@ curl -X POST http://192.168.1.100/api/updateValueCommand \
 #### Set Sampling Frequency
 
 ```bash
-curl -X POST http://192.168.1.100/api/updateValueCommand \
+curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
     -d "{'id':'SAMPLING FREQ','value':'100'}"
 ```
@@ -220,330 +216,37 @@ curl -X POST http://192.168.1.100/api/updateValueCommand \
 #### Query Device Information (Exception Endpoint)
 
 ```bash
-curl -X POST http://192.168.1.100/api/getValue \
+curl -X POST http://192.168.0.1/api/getValue \
     -H "Content-Type: application/json" \
     -d "{'id':'serialNumber'}"
 ```
-
 Response:
 ```json
 {"id":"serialNumber","value":"A1570-12345"}
 ```
-
-### Python Examples
-
-Install the requests library:
-```bash
-pip install requests
-```
-
-#### Basic Parameter Query and Update
-
-```python
-import requests
-import json
-
-# Device configuration
-DEVICE_IP = "192.168.1.100"
-BASE_URL = f"http://{DEVICE_IP}/api"
-
-def get_parameter(command_id):
-    """Query a parameter value using /api/getValueCommand"""
-    url = f"{BASE_URL}/getValueCommand"
-    payload = {"id": command_id}
-    
-    response = requests.post(url, json=payload)
-    
-    if response.status_code == 200:
-        data = response.json()
-        return data.get("value")
-    else:
-        print(f"Error {response.status_code}: {response.text}")
-        return None
-
-def set_parameter(command_id, value):
-    """Update a parameter value using /api/updateValueCommand"""
-    url = f"{BASE_URL}/updateValueCommand"
-    payload = {"id": command_id, "value": str(value)}
-    
-    response = requests.post(url, json=payload)
-    
-    if response.status_code == 200:
-        data = response.json()
-        return data.get("value")
-    else:
-        print(f"Error {response.status_code}: {response.text}")
-        return None
-
-# Example usage
-current_gain = get_parameter("GAIN")
-print(f"Current GAIN: {current_gain} dB")
-
-new_gain = set_parameter("GAIN", 25)
-print(f"New GAIN: {new_gain} dB")
-```
-
-#### Start and Stop Acquisition
-
-```python
-import requests
-import time
-
-DEVICE_IP = "192.168.1.100"
-BASE_URL = f"http://{DEVICE_IP}/api"
-
-def send_command(command_id, value=None):
-    """Send a command to the device"""
-    url = f"{BASE_URL}/updateValueCommand"
-    payload = {"id": command_id}
-    if value is not None:
-        payload["value"] = str(value)
-    
-    response = requests.post(url, json=payload)
-    return response.status_code == 200
-
-# Configure acquisition parameters
-send_command("GAIN", 30)
-send_command("SAMPLING FREQ", 100)  # 100 MHz
-send_command("ACCUMULATIONS", 2)
-
-# Start acquisition
-print("Starting acquisition...")
-send_command("START AUTO ASCAN")
-
-# Run for 10 seconds
-time.sleep(10)
-
-# Stop acquisition
-print("Stopping acquisition...")
-send_command("STOP AUTO ASCAN")
-```
-
-#### Query Device Information (Exception Endpoints)
-
-```python
-import requests
-
-DEVICE_IP = "192.168.1.100"
-BASE_URL = f"http://{DEVICE_IP}/api"
-
-def get_exception_parameter(param_id):
-    """Query exception endpoint parameters using /api/getValue"""
-    url = f"{BASE_URL}/getValue"
-    payload = {"id": param_id}
-    
-    response = requests.post(url, json=payload)
-    
-    if response.status_code == 200:
-        data = response.json()
-        return data.get("value")
-    else:
-        print(f"Error {response.status_code}: {response.text}")
-        return None
-
-# Query device information
-serial = get_exception_parameter("serialNumber")
-version = get_exception_parameter("version")
-fw_version = get_exception_parameter("firmwareVersion")
-
-print(f"Serial Number: {serial}")
-print(f"Version: {version}")
-print(f"Firmware Version: {fw_version}")
-```
-
-#### Error Handling with Timeout
-
-```python
-import requests
-from requests.exceptions import Timeout, RequestException
-
-DEVICE_IP = "192.168.1.100"
-BASE_URL = f"http://{DEVICE_IP}/api"
-TIMEOUT = 5  # seconds
-
-def set_parameter_safe(command_id, value):
-    """Update a parameter with error handling and timeout"""
-    url = f"{BASE_URL}/updateValueCommand"
-    payload = {"id": command_id, "value": str(value)}
-    
-    try:
-        response = requests.post(url, json=payload, timeout=TIMEOUT)
-        
-        if response.status_code == 200:
-            data = response.json()
-            print(f"Success: {command_id} set to {data.get('value')}")
-            return True
-        elif response.status_code == 400:
-            print(f"Bad request: {response.text}")
-            return False
-        elif response.status_code == 500:
-            print(f"Server error: {response.text}")
-            return False
-        else:
-            print(f"Unexpected status {response.status_code}: {response.text}")
-            return False
-            
-    except Timeout:
-        print(f"Request timeout after {TIMEOUT} seconds")
-        return False
-    except RequestException as e:
-        print(f"Request failed: {e}")
-        return False
-
-# Example usage
-set_parameter_safe("GAIN", 35)
-set_parameter_safe("HV VOLTAGE", 400)
-```
-
-#### Complete Device Configuration Example
-
-```python
-import requests
-import time
-
-DEVICE_IP = "192.168.1.100"
-BASE_URL = f"http://{DEVICE_IP}/api"
-
-class A1570Device:
-    def __init__(self, ip_address):
-        self.base_url = f"http://{ip_address}/api"
-        self.timeout = 5
-    
-    def get_parameter(self, command_id):
-        """Query a parameter value"""
-        url = f"{self.base_url}/getValueCommand"
-        payload = {"id": command_id}
-        
-        try:
-            response = requests.post(url, json=payload, timeout=self.timeout)
-            if response.status_code == 200:
-                return response.json().get("value")
-        except Exception as e:
-            print(f"Error querying {command_id}: {e}")
-        return None
-    
-    def set_parameter(self, command_id, value):
-        """Update a parameter value"""
-        url = f"{self.base_url}/updateValueCommand"
-        payload = {"id": command_id, "value": str(value)}
-        
-        try:
-            response = requests.post(url, json=payload, timeout=self.timeout)
-            if response.status_code == 200:
-                return True
-        except Exception as e:
-            print(f"Error setting {command_id}: {e}")
-        return False
-    
-    def send_command(self, command_id):
-        """Send a command without value"""
-        return self.set_parameter(command_id, "")
-    
-    def get_device_info(self, param_id):
-        """Query device information using exception endpoint"""
-        url = f"{self.base_url}/getValue"
-        payload = {"id": param_id}
-        
-        try:
-            response = requests.post(url, json=payload, timeout=self.timeout)
-            if response.status_code == 200:
-                return response.json().get("value")
-        except Exception as e:
-            print(f"Error querying {param_id}: {e}")
-        return None
-    
-    def configure_acquisition(self, gain=30, sampling_freq=100, 
-                             accumulations=2, hv_voltage=400):
-        """Configure acquisition parameters"""
-        params = {
-            "GAIN": gain,
-            "SAMPLING FREQ": sampling_freq,
-            "ACCUMULATIONS": accumulations,
-            "HV VOLTAGE": hv_voltage
-        }
-        
-        for cmd, val in params.items():
-            if not self.set_parameter(cmd, val):
-                print(f"Failed to set {cmd}")
-                return False
-        return True
-    
-    def start_acquisition(self):
-        """Start data acquisition"""
-        return self.send_command("START AUTO ASCAN")
-    
-    def stop_acquisition(self):
-        """Stop data acquisition"""
-        return self.send_command("STOP AUTO ASCAN")
-
-# Example usage
-device = A1570Device("192.168.1.100")
-
-# Get device information
-print("=== Device Information ===")
-print(f"Serial Number: {device.get_device_info('serialNumber')}")
-print(f"Firmware Version: {device.get_device_info('firmwareVersion')}")
-print()
-
-# Configure acquisition
-print("=== Configuring Acquisition ===")
-if device.configure_acquisition(gain=30, sampling_freq=100, 
-                               accumulations=2, hv_voltage=400):
-    print("Configuration successful")
-    
-    # Verify settings
-    print(f"GAIN: {device.get_parameter('GAIN')} dB")
-    print(f"SAMPLING FREQ: {device.get_parameter('SAMPLING FREQ')} MHz")
-    print()
-    
-    # Start acquisition
-    print("Starting acquisition...")
-    device.start_acquisition()
-    
-    # Run for 10 seconds
-    time.sleep(10)
-    
-    # Stop acquisition
-    print("Stopping acquisition...")
-    device.stop_acquisition()
-    print("Done")
-else:
-    print("Configuration failed")
-```
-
 ## WebSocket Integration
 
 The A1570 device supports real-time data streaming and event notifications via WebSocket. This is primarily used for high-throughput transfer of A-scan vectors, measurement results, and device status updates.
 
-### How to Use WebSockets
+**Endpoint:** `ws://<device-ip>/ws`
 
-- **Endpoint:**
-  - Connect to `ws://<device-ip>/ws` (replace `<device-ip>` with your device's IP address)
+**Typical Workflow:**
+1. Configure device using REST API
+2. Start acquisition using REST API
+3. Establish WebSocket connection
+4. Receive measurement data streams
+5. Stop acquisition and disconnect
 
-- **Connection Example (JavaScript):**
-```javascript
-const ws = new WebSocket('ws://192.168.1.100/ws');
-ws.onopen = () => {
-  console.log('WebSocket connection established');
-  // You can send commands or subscribe to events here
-};
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log('Received:', data);
-  // Handle measurement results, status updates, etc.
-};
-ws.onclose = () => {
-  console.log('WebSocket connection closed');
-};
-ws.onerror = (err) => {
-  console.error('WebSocket error:', err);
-};
-```
+### Examples
 
-- **Typical Workflow:**
-  1. Establish a WebSocket connection after device configuration (using REST API)
-  2. Listen for incoming messages containing measurement data
-  
+Complete working examples are available in the `examples/` directory:
+
+- **[examples/rest_api_python_examples.py](examples/rest_api_python_examples.py)** - Full Python workflow with REST API and WebSocket
+- **[examples/websocket_js_example.js](examples/websocket_js_example.js)** - JavaScript WebSocket client
+
+See **[examples/README.md](examples/README.md)** for detailed documentation and usage instructions.
+
+
 ## Network Configuration
 
 The device provides additional REST API endpoints for network configuration, firmware updates, preset management, and logging. See the complete API documentation in the device manual for details on these specialized endpoints.
@@ -553,7 +256,6 @@ The device provides additional REST API endpoints for network configuration, fir
 - All numeric values should be sent as strings in JSON payloads
 - Command IDs are case-sensitive
 - Some parameters are read-only (check Argument/Range column)
-- The device uses internal command translation from web interface IDs to SCPI command IDs
 - Response times vary depending on device processing load; implement appropriate timeouts
 - For parameters with enumerated values (e.g., `SAMPLING FREQ`), use the exact value strings as specified
 
