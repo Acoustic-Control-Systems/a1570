@@ -8,6 +8,9 @@ The examples demonstrate how to initialize the device, calibrate probes, and per
 
 # Contents
 
+* [Complete SCPI command reference](SCPI_REFERENCE.md) - Syntax and behavior of every command registered by the firmware
+* [Read MCU diagnostic log](SCPI_Python/read_mcu_log.py) - Simple, extensively commented Python example with no external packages
+* [Follow MCU diagnostic log](SCPI_Python/follow_mcu_log.py) - Continuously append newly arriving MCU log entries to a file
 * [Thickness Measurement (Pulse Mode)](SCPI_Python/thickness_measurement_pulse.py) - Example of automatic thickness measurement using pulse magnet probes (e.g. S3950)
 * [Thickness Measurement (Permanent Mode)](SCPI_Python/thickness_measurement_permanent.py) - Example of automatic thickness measurement using permanent magnet probes (e.g. S7394)
 * [Thickness Measurement (Semiautomatic Permanent Mode)](SCPI_Python/thickness_measurement_semiautomatic_permanent.py) - Example of semiautomatic thickness measurement using permanent magnet probes (e.g. S7694)
