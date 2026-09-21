@@ -258,6 +258,7 @@ The device provides additional REST API endpoints for network configuration, fir
 - Some parameters are read-only (check Argument/Range column)
 - Response times vary depending on device processing load; implement appropriate timeouts
 - For parameters with enumerated values (e.g., `SAMPLING FREQ`), use the exact value strings as specified
+- Device documentation could be found [here](https://subscribe.acs-international.online/product/download/17)
 
 ## License
 

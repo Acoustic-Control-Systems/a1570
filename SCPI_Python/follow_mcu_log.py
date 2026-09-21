@@ -100,7 +100,9 @@ def follow(device_address, output_path, poll_interval, include_existing):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("device_address", help="A1570 IP address or hostname")
+    parser.add_argument("--device_address", 
+                        default="192.168.0.1",
+                        help="A1570 IP address or hostname")
     parser.add_argument(
         "--output", default="mcu_log.txt", help="file to append to"
     )
