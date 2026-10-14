@@ -129,9 +129,15 @@ def main():
         try:
             async with websockets.connect(WS_URL) as ws:
                 print("WebSocket connection established.")
-                start_time = time.time()
-                while time.time() - start_time < 10:
-                    data = await ws.recv()
+                deadline = time.monotonic() + 10
+                while True:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        break
+                    try:
+                        data = await asyncio.wait_for(ws.recv(), timeout=remaining)
+                    except asyncio.TimeoutError:
+                        break
                     if isinstance(data, (bytes, bytearray)):
                         arr = np.frombuffer(data, dtype=np.int16)
                         print(f"Received {len(arr)} samples. First value: {arr[0]}")

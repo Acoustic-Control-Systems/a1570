@@ -8,7 +8,7 @@ The A1570 ultrasonic testing device provides a comprehensive REST API for remote
 
 **Content-Type:** All requests must include `Content-Type: application/json` header
 
-**Response Format:** JSON
+**Response Format:** JSON for queries; plain text for setters and errors.
 
 ## API Endpoints
 
@@ -56,13 +56,13 @@ Most device parameters use these endpoints with command IDs defined in the SCPI 
 }
 ```
 
-**Response:**
-```json
-{
-  "id": "<COMMAND_ID>",
-  "value": "<value>"
-}
+**Response:** HTTP 200, `text/plain`:
+```text
+Value updated successfully
 ```
+
+This response precedes the MCU reply. Query the parameter to verify acceptance.
+Commands without arguments still require `"value": ""`.
 
 ### Exception Endpoints
 
@@ -88,7 +88,7 @@ The following parameters use `/api/getValue` and `/api/updateValue` instead of t
 | GAIN | 0-40 | Constant gain at input (dB) |
 | SOURCE SYNC TYPE | INTERNAL \| EXTERNAL | Acquisition triggering mode |
 | SAMPLING FREQ | 25 \| 50 \| 100 | Input sampling rate (MHz) |
-| ACCUMULATIONS | 0-4 | Acquisitions per averaged vector |
+| ACCUMULATIONS | 0-13 | Accumulation exponent A; acquisitions = 2^A |
 | FILTER | integer | Digital high-pass filter number |
 
 ### Transmitter Settings
@@ -176,7 +176,7 @@ Error responses include a descriptive text message.
 ```bash
 curl -X POST http://192.168.0.1/api/getValueCommand \
     -H "Content-Type: application/json" \
-    -d "{'id':'GAIN'}"
+    -d '{"id":"GAIN"}'
 ```
 
 Response:
@@ -189,12 +189,12 @@ Response:
 ```bash
 curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
-    -d "{'id':'GAIN','value':'30'}"
+    -d '{"id":"GAIN","value":"30"}'
 ```
 
-Response:
-```json
-{"id":"GAIN","value":"30"}
+Response (`text/plain`):
+```text
+Value updated successfully
 ```
 
 #### Start Acquisition
@@ -202,7 +202,7 @@ Response:
 ```bash
 curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
-    -d "{'id':'START AUTO ASCAN'}"
+    -d '{"id":"START AUTO ASCAN","value":""}'
 ```
 
 #### Set Sampling Frequency
@@ -210,7 +210,7 @@ curl -X POST http://192.168.0.1/api/updateValueCommand \
 ```bash
 curl -X POST http://192.168.0.1/api/updateValueCommand \
     -H "Content-Type: application/json" \
-    -d "{'id':'SAMPLING FREQ','value':'100'}"
+    -d '{"id":"SAMPLING FREQ","value":"100"}'
 ```
 
 #### Query Device Information (Exception Endpoint)
@@ -218,7 +218,7 @@ curl -X POST http://192.168.0.1/api/updateValueCommand \
 ```bash
 curl -X POST http://192.168.0.1/api/getValue \
     -H "Content-Type: application/json" \
-    -d "{'id':'serialNumber'}"
+    -d '{"id":"serialNumber"}'
 ```
 Response:
 ```json

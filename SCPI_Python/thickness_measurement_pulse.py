@@ -152,7 +152,7 @@ if is_manual_calibration:
 else:
     # set probe delay [us]
     pd = 0.21
-    inst.write(f'SENSe:PROBe:DELay:PROCessing {pd}')
+    inst.write(f'SENSe:PROBe:DELay:PROCessing {pd:.2f}')
     answ = inst.query('SENSe:PROBe:DELay:PROCessing?')
     assert pd == float(answ), f'Failed on setting the probe delay to {pd}. Received {answ}'
 

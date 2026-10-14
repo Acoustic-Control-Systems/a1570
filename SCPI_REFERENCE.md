@@ -15,7 +15,7 @@ description says that vector data is returned.
   and `DOWN`. The instrument validates its model-specific range.
 - Use `SYSTem:ERRor[:NEXT]?` after a rejected command to read the error.
 
-This list follows the command table registered by the ESP32 firmware.
+This list covers supported integration commands in the ESP32 firmware.
 
 ## MCU persistent log
 
@@ -44,12 +44,9 @@ timestamp. It is a millisecond boot-time clock, not UTC.
 | `*ESE <mask>` / `*ESE?` | Set/query the Standard Event Status Enable register. |
 | `*ESR?` | Read and clear the Standard Event Status register. |
 | `*IDN?` | Return manufacturer, model, serial number, and firmware version. |
-| `*OPC` / `*OPC?` | Set/query operation-complete status. |
-| `*RST` | Reset SCPI-controlled settings. |
 | `*SRE <mask>` / `*SRE?` | Set/query the Service Request Enable register. |
 | `*STB?` | Read the status byte. |
 | `*TST?` | Run the implemented self-test; `0` means success. |
-| `*WAI` | Wait for pending operations. |
 
 ## SYSTem and standard status
 
@@ -94,7 +91,7 @@ timestamp. It is a millisecond boot-time clock, not UTC.
 | `[:SOURce]:TRANsmitter:DURation` / `...?` | numeric or special | Set/query burst duration. |
 | `[:SOURce]:TRANsmitter:ENABle` / `...?` | boolean | Enable/query the transmitter. |
 | `[:SOURce]:TRANsmitter:MODE` / `...?` | mode | Set/query transducer polarity. |
-| `[:SOURce]:DATA:LENGth` / `...?` | integer | Set/query acquired vector length. |
+| `[:SOURce]:DATA:LENGth?` | none | Query acquired vector length. |
 | `[:SOURce]:VELocity[:SOUNd]` / `...?` | numeric or special | Set/query sound velocity. |
 | `[:SOURce]:ZONDer:MODE` / `...?` | string | Set/query Zonder processing mode. |
 | `[:SOURce]:SNDVector[:ENABle]` / `...?` | boolean | Include/query processed result vectors. |
@@ -103,7 +100,7 @@ timestamp. It is a millisecond boot-time clock, not UTC.
 
 | Command | Parameter | Description |
 |---|---|---|
-| `[:SENSe]:AVERage:COUNt` / `...?` | numeric or special | Set/query acquisitions per average. |
+| `[:SENSe]:AVERage:COUNt` / `...?` | numeric or special | Set/query accumulation exponent A (0-4); acquisitions = 2^A. |
 | `[:SENSe]:AVERage:PERiod` / `...?` | time or special | Set/query constant averaging interval. |
 | `[:SENSe]:AVERage:PERiod:RANDom` / `...?` | time or special | Set/query random averaging interval. |
 | `[:SENSe]:FILTer:HPASs[:NUMBer]` / `...?` | filter name | Select/query high-pass filter. |
